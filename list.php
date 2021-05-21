@@ -36,9 +36,12 @@
 					</div>
 					<!-- body -->
 					<div class="modal-body">
+
+						<!-- ck_read.php로 전송 -->
 						<form method="post" id="modal_form" data-action="./ck_read.php?idx=">
 							<p>비밀번호  <input type="password" name="pw_chk" /> <input type="submit" class="btn btn-primary" value="확인" /></p>
 						</form>
+
 					</div>
 			  	</div>
 		  	</div>
@@ -65,22 +68,26 @@
 			    	$total_record = mysqli_num_rows($sql); // 게시판 총 레코드 수
 			    	$list = 5; // 한 페이지에 보여줄 개수
 			  		$block_cnt = 5; // 블록당 보여줄 페이지 개수
+					  //??
 			  		$block_num = ceil($page / $block_cnt); // 현재 페이지 블록 구하기
-			  		$block_start = (($block_num - 1) * $block_cnt) + 1; // 블록의 시작 번호  ex) 1,6,11 ...
+			  		$block_start = (($block_num - 1) * $block_cnt) + 1; // 블록의 시작 번호  ex) 1,6,11 ... (1페이지~5페이지까지는 1번 블록부터? 6페이지부터 10페이지까지는 6번 블록부터 시작~)
 			    	$block_end = $block_start + $block_cnt - 1; // 블록의 마지막 번호 ex) 5,10,15 ...
-			    	
-			    	
+			    				    	
 			    	$total_page = ceil($total_record / $list); // 페이징한 페이지 수
+
+					//???
 			    	if($block_end > $total_page){ // 블록의 마지막 번호가 페이지 수 보다 많다면
 			    		$block_end = $total_page; // 마지막 번호는 페이지 수
 			    	}
+
 			    	$total_block = ceil($total_page / $block_cnt); // 블럭 총 개수
-			    	$page_start = ($page - 1) * $list; // 페이지 시작
+			    	
+					//? 0???
+					$page_start = ($page - 1) * $list; // 페이지 시작
 			    	
 			    	/* 게시글 정보 가져오기  limit : (시작번호, 보여질 수) */
 					// LIMIT 0, 5 (0번부터 5개 / 0,1,2,3,4)   / LIMIT 5, 5 (5번부터 5개 / 5,6,7,8,9) ....
-			    	$sql2 = mq("SELECT * FROM board ORDER BY idx DESC LIMIT $page_start, $list
-			    			");
+			    	$sql2 = mq("SELECT * FROM board ORDER BY idx DESC LIMIT $page_start, $list");
 
 			    	while($board = $sql2->fetch_array()){ //결과 $board에 담기
 			    		$title = $board["title"];
@@ -105,16 +112,18 @@
 			      	<tr>
 			          <td width="70"><?=$board['idx']; ?></td>
 			          <td width="500">
+
 			          <!-- 비밀 글 가져오기 -->	 
 			          <?php 
 			          	$lockimg="<img src='./img/lock.png' alt='lock' title='lock' width='18' height='18'>";
+
 			          	if($board['lock_post']=="1"){ // lock_post 값이 1이면 잠금
 			          ?>
-			          		<span class="lock_check" style="cursor:pointer" data-action="./read.php?idx="
-			          		data-check=<?=$role ?> data-idx="<?=$board['idx']?>" ><?=$title?> <?=$lockimg?></span>
+			          		<span class="lock_check" style="cursor:pointer" data-action="./read.php?idx=" data-check=<?=$role ?> data-idx="<?=$board['idx']?>" ><?=$title?> <?=$lockimg?></span>
+
 			          <!-- 일반 글 가져오기 -->
 			          <?php 
-			          	}else{	// 아니면 공개 글
+			          	} else{	// 아니면 공개 글
 			          ?>
 			          		<span class="read_check" style="cursor:pointer" data-action="./read.php?idx=<?=$board['idx']?>" ><?=$title?></span> 
 			          		<span style="color:blue;">[<?=$rep_count?>]</span></td>
@@ -128,31 +137,33 @@
 			      </tbody>
 			      <?php } ?>
 			    </table>
+
+				<!-- 페이징 -->
 			    <div id="page_num" style="text-align: center;">
 			    	<?php
-				    	if ($page <= 1){
+				    	if ($page <= 1){ // 1이면 처음 단어 안 나옴
 				    		// 빈 값
-				    	} else {
+				    	} else { // 1페이지 아니면 처음 나오게
 				    		echo "<a href='list.php?page=1'>처음</a>";
 				    	}
 				    	
 				    	if ($page <= 1){
 				    		// 빈 값
-				    	} else {
+				    	} else { // 1페이지보다 크면 이전 페이지 버튼 생성
 				    		$pre = $page - 1;
 				    		echo "<a href='list.php?page=$pre'>◀ 이전 </a>";
 				    		
 				    	}
-				    	
+				    	// 1 <= $i <= 5, i++ // 6<= $i <= 10 ...
 				    	for($i = $block_start; $i <= $block_end; $i++){
-				    		if($page == $i){
+				    		if($page == $i){ //열고있는 페이지 bold & a태그에서 b태그로 바뀜. 클릭 안 됨.
 				    			echo "<b> $i </b>";
-				    		} else {
+				    		} else { //page 전달
 				    			echo "<a href='list.php?page=$i'> $i </a>";
 				    		}
 				    	}
 				    	
-				    	if($page >= $total_page){
+				    	if($page >= $total_page){ 
 				    		// 빈 값
 				    	} else {
 				    		$next = $page + 1;
@@ -166,6 +177,8 @@
 				    	}
 					?>
 				</div>	
+
+				<!-- 글쓰기 -->
 			    <div id="write_btn">
 			      <a href="write.php"><button class="btn btn-primary pull-right" >글쓰기</button></a>
 			    </div>
@@ -177,7 +190,7 @@
 			  			<option value="content">내용</option>
 			  		</select>
 			  		<input type="text" name="search" size="40" required="required">
-			  			<button class="btn btn-primary">검색</button>
+			  		<button class="btn btn-primary">검색</button>
 			  	</form>
 			  </div>
 		  </div>
@@ -186,17 +199,23 @@
 		
 		<script>
 		// <!-- 비밀글 클릭시 모달창을 띄우는 이벤트 -->
+		// 글 비밀번호 입력해야 함
 		$(function(){
 		    $(".lock_check").click(function(){
 			    // <!-- 관리자 계정일 경우 바로 해당 글로 이동 -->
 			    if($(this).attr("data-check")=="ADMIN") {
 			    	var action_url = $(this).attr("data-action")+$(this).attr("data-idx");
 					$(location).attr("href",action_url);
+					// location.href = "./read.php?idx=<?=$board['idx']?>"
 			    }
+
+				// 관리자 아닐 경우 모달창 오픈
 				$("#modal_div").modal();
 				// <!-- 주소에 data-idx(idx)값을 더하기 -->
 				var action_url = $("#modal_form").attr("data-action")+$(this).attr("data-idx");
 				$("#modal_form").attr("action",action_url);
+				// "./ck_read.php?idx=<?=$board['idx']?>"
+				// 게시글 번호 가지고 ck_read.php로 이동
 			});
 		});
 	
