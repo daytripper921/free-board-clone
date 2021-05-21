@@ -1,5 +1,8 @@
 <?php
+	// 로그인할 떄, 세션값
 	include_once "./config.php";
+
+	// $_SESSION["userid"]를 처음에 어떻게 어디서 지정???
 ?>
 <!DOCTYPE html>
 <html>
@@ -27,7 +30,8 @@
 							<input type="password" class="form-control" placeholder="비밀번호" name="pass" maxlength="20">
 						</div>
 						
-						<a href="#"><span class="btn btn-primary form-control" onclick="check_input()">로그인</span></a>
+						<a href="#"><span class="btn btn-primary form-control" onclick="check_input()">로그인</span></a> 
+						<!-- check_input.js -->
 					</form>
 					
 				</div>

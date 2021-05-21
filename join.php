@@ -64,11 +64,16 @@
 		</div>
 		<script>
 
+			/* 
+			form-group의 data-check 속성은 결국 어디에 쓰임???
+			*/
+
+
 			/* 아이디 중복 체크(비동기통신) */
 			$(function(){/*문서가 로드되면 function을 실행하라  */
 				$("#id").blur(function(){/*아이디가 id인것을 찾아 포커즈를 빠져나갈때 발생하는 이벤트  */
 					if($(this).val()==""){
-						$("#id_check_msg").html("아이디를 입력하세요.").css("color","red").attr("data-check","0");/*선택자를 .연사자추가해서 계속 사용가능  */
+						$("#id_check_msg").html("아이디를 입력하세요.").css("color","red").attr("data-check","0");/*선택자를 .연산자추가해서 계속 사용가능  */
 						$(this).focus();
 					}else{
 						checkIdAjax();				
@@ -93,20 +98,26 @@
 				$.ajax({				//비동기통신방법, 객체로 보낼때{}사용
 					url : "./ajax/check_id.php",
 					type : "post",
+					// async : 'true'가 디폴트. 비동기 방식으로.
 					dataType : "json",
 					data : {
-						"id" : $("#id").val()
+						"id" : $("#id").val() //post 방식으로 post_['id']를 넘김
 					},
-					success : function(data){
-						if(data.check){			//json사용했기때문에 data.으로 접근가능  //data-check 라는 속성값? 1이면 true, 0이면 false. 그럼 이 전에 이걸 어디서 바꿔주는거임???
+					// 여기서 data는 check_id.php의 echo로 받은 $ret['check'] 값... 중복된 값이 없으면 true를 받음.
+					//$ret['check'] = false; data 중에서 key가 check인 걸 json 형태로 불러오기때문에 data.check 이렇게 가져올 수 있다는 말인듯..
+					success : function(data){ //data: 서버에 요청할 때 보낼 매개변수... $ret
+						if(data.check){			//json사용했기때문에 data.으로 접근가능  
 							$("#id_check_msg").html("사용 가능한 아이디입니다.").css("color", "blue").attr("data-check","1");
 						}else{
 							$("#id_check_msg").html("중복된 아이디입니다.").css("color", "red").attr("data-check","0");
 							$("#id").focus();
 						}
+						console.log(data); //{check: true} 라고 나옴
+						console.log(data.check); //true
 					}, error : function(data){
-						// console.log(data);
-						// console.log(data.check);
+						
+					}, complete : function(data, textStatus){ //작업완료 후 처리
+
 					}
 				});
 			}
